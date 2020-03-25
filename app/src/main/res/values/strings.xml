@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">CovTrack</string>
+    <string name="title_activity_maps">Map</string>
+
+
+    <string name="text_detected_devices_brief_ro">Interactionati cu urmatoarele dispozitive</string>
+    <string name="text_infected_devices_brief_ro">Urmatoarele dispozitive cu care ati interactionat \n sunt pacienti ce au fost infectati cu COVID-19.\n Mergeti sa faceti un control.</string>
+    <string name="button_confirm_ro">Da</string>
+    <string name="button_deny_ro">Nu</string>
+    <string name="button_back_ro">INAPOI</string>
+
+    <string name="button_verify_db_ro">VERIFICA BAZA DE DATE</string>
+    <string name="button_verify_stat_ro">VERIFICA STATISTICI</string>
+
+    <string name="title_no_location_ro">Va rugam sa porniti locatia GPS</string>
+    <string name="text_no_location_ro">Pentru a putea detecta posibile persoane infectate este nevoie de locatia telefonului. \nDoriti sa porniti locatia?</string>
+
+    <string name="title_no_patient_location_ro">Locatie indisponibila</string>
+    <string name="text_no_patient_location_ro">Pentru acest pacient nu este disponibila locatia.</string>
+
+    <string name="title_db_error_ro">Baza de date indisponibila</string>
+    <string name="text_db_error_ro">Nu se poate realiza conexiunea la baza de date. \nContactati un administrator</string>
+
+    <string name="title_no_interact_ro">Nu ai interactionat pana acum cu pacienti</string>
+    <string name="text_no_interact_ro">Esti in siguranta.</string>
+
+    <string name="title_no_network_ro">LIPSA INTERNET</string>
+    <string name="text_no_network_ro">Va rugam sa va porniti datele mobile.</string>
+
+    <string name="text_duration_ro">Durata</string>
+    <string name="text_proximity_ro">Distanta</string>
+
+    <string name="text_distance_very_close_ro">foarte aproape</string>
+    <string name="text_distance_close_ro">aproape</string>
+    <string name="text_distance_far_ro">departe</string>
+
+    <string name="text_detected_devices_brief_en">You are detecting the following devices</string>
+    <string name="text_infected_devices_brief_en">The following devices that you had contact \n are patients that are infected with COVID19.\n Go and test yourself.</string>
+    <string name="button_confirm_en">Yes</string>
+    <string name="button_deny_en">No</string>
+    <string name="button_back_en">BACK</string>
+
+    <string name="button_verify_db_en">VERIFY DATABASE</string>
+    <string name="button_verify_stat_en">VERIFY STATISTICS</string>
+
+    <string name="title_no_location_en">Please turn on GPS location</string>
+    <string name="text_no_location_en">In order to detect potential patients the GPS location needs to be turned on. \nDo you want to turn on the location?</string>
+
+    <string name="title_no_patient_location_en">Location unavailable</string>
+    <string name="text_no_patient_location_en">For this patient the location is unavailable.</string>
+
+    <string name="title_db_error_en">Connection to database refused.</string>
+    <string name="text_db_error_en">The connection to the database cannot be established. \nContact an administrator</string>
+
+    <string name="title_no_interact_en">You have not met patients</string>
+    <string name="text_no_interact_en">You are safe.</string>
+
+    <string name="title_no_network_en">NO INTERNET CONNECTION</string>
+    <string name="text_no_network_en">Please turn on mobile data.</string>
+
+    <string name="text_duration_en">Duration</string>
+    <string name="text_proximity_en">Distance</string>
+
+    <string name="text_distance_very_close_en">very close</string>
+    <string name="text_distance_close_en">close</string>
+    <string name="text_distance_far_en">far away</string>
+
+</resources>

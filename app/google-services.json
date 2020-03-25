@@ -1,0 +1,221 @@
+{
+  "project_info": {
+    "project_number": "133120585224",
+    "firebase_url": "https://agoratest-e3b1b.firebaseio.com",
+    "project_id": "agoratest-e3b1b",
+    "storage_bucket": "agoratest-e3b1b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:133120585224:android:e4be1368ab3460e0a1abbd",
+        "android_client_info": {
+          "package_name": "com.example.databasefiletest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "133120585224-hvlnl58fka21l9rtsffh6lja8ssrlp72.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRFmKVQmt87t-57uT07pyhAGo5crJmOUQ"
+        },
+        {
+          "current_key": "AIzaSyDRGbcTObBx0fNAVQax6y3nlD4HSx_O3jo"
+        },
+        {
+          "current_key": "AIzaSyBHL_WdAQWLdB0dUnRQiVy1XlR6RFyhC-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "133120585224-hvlnl58fka21l9rtsffh6lja8ssrlp72.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "133120585224-g20v29c8cj5vu7nmf644042aq4cg2j94.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ofarm.agorapositionsdk"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:133120585224:android:7a3667c915d2a0e9",
+        "android_client_info": {
+          "package_name": "com.ofarm.agora"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "133120585224-hvlnl58fka21l9rtsffh6lja8ssrlp72.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRFmKVQmt87t-57uT07pyhAGo5crJmOUQ"
+        },
+        {
+          "current_key": "AIzaSyDRGbcTObBx0fNAVQax6y3nlD4HSx_O3jo"
+        },
+        {
+          "current_key": "AIzaSyBHL_WdAQWLdB0dUnRQiVy1XlR6RFyhC-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "133120585224-hvlnl58fka21l9rtsffh6lja8ssrlp72.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "133120585224-g20v29c8cj5vu7nmf644042aq4cg2j94.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ofarm.agorapositionsdk"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:133120585224:android:28a8347a1b3b6380",
+        "android_client_info": {
+          "package_name": "com.ofarm.agorastuff"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "133120585224-hvlnl58fka21l9rtsffh6lja8ssrlp72.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRFmKVQmt87t-57uT07pyhAGo5crJmOUQ"
+        },
+        {
+          "current_key": "AIzaSyDRGbcTObBx0fNAVQax6y3nlD4HSx_O3jo"
+        },
+        {
+          "current_key": "AIzaSyBHL_WdAQWLdB0dUnRQiVy1XlR6RFyhC-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "133120585224-hvlnl58fka21l9rtsffh6lja8ssrlp72.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "133120585224-g20v29c8cj5vu7nmf644042aq4cg2j94.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ofarm.agorapositionsdk"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:133120585224:android:f3e43bc43ed6dfbba1abbd",
+        "android_client_info": {
+          "package_name": "com.ofarm.sdk_agorauser"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "133120585224-hvlnl58fka21l9rtsffh6lja8ssrlp72.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRFmKVQmt87t-57uT07pyhAGo5crJmOUQ"
+        },
+        {
+          "current_key": "AIzaSyDRGbcTObBx0fNAVQax6y3nlD4HSx_O3jo"
+        },
+        {
+          "current_key": "AIzaSyBHL_WdAQWLdB0dUnRQiVy1XlR6RFyhC-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "133120585224-hvlnl58fka21l9rtsffh6lja8ssrlp72.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "133120585224-g20v29c8cj5vu7nmf644042aq4cg2j94.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ofarm.agorapositionsdk"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:133120585224:android:574b7b2a7f161532",
+        "android_client_info": {
+          "package_name": "com.roinspace.agoralocatorexample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "133120585224-hvlnl58fka21l9rtsffh6lja8ssrlp72.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRFmKVQmt87t-57uT07pyhAGo5crJmOUQ"
+        },
+        {
+          "current_key": "AIzaSyDRGbcTObBx0fNAVQax6y3nlD4HSx_O3jo"
+        },
+        {
+          "current_key": "AIzaSyBHL_WdAQWLdB0dUnRQiVy1XlR6RFyhC-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "133120585224-hvlnl58fka21l9rtsffh6lja8ssrlp72.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "133120585224-g20v29c8cj5vu7nmf644042aq4cg2j94.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ofarm.agorapositionsdk"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
