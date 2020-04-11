@@ -4,13 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     tools:context=".InfectedPatientsActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout4"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="70dp"
+        android:layout_marginEnd="10dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
         app:layout_constraintEnd_toEndOf="parent"
@@ -46,16 +49,23 @@
         android:id="@+id/linearLayout3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <Button
+        <ImageButton
             android:id="@+id/verifyBtn"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Inapoi" />
+            android:layout_height="74dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:src="@drawable/main_menu_btn_selector_en"
+            android:text="" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

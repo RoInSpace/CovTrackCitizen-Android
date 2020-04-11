@@ -28,21 +28,21 @@ public class BTDevice {
     private final static int RSSI_MIN = -80;
     private static int SESSION_LIFETIME = 120;
 
-    private String  address;
-    private int     maxRSSI;
-    private Date    firstContactDate;
-    private Date    startCurrentSessionDate;
-    private Date    stopCurrentSessionDate;
-    private Location startCurrentSessionLocation;
-    private Location stopCurrentSessionLocation;
+    private String      address;
+    private int         maxRSSI;
+    private Date        firstContactDate;
+    private Date        startCurrentSessionDate;
+    private Date        stopCurrentSessionDate;
+    private Location    startCurrentSessionLocation;
+    private Location    stopCurrentSessionLocation;
 
-    private int     currentSessionDuration;
-    private Date    startMaximumSessionDate;
-    private Date    stopMaximumSessionDate;
-    private Location startMaximumSessionLocation;
-    private Location stopMaximumSessionLocation;
-    private int     maximumSessionDuration = 0;
-    private short   status;
+    private int         currentSessionDuration;
+    private Date        startMaximumSessionDate;
+    private Date        stopMaximumSessionDate;
+    private Location    startMaximumSessionLocation;
+    private Location    stopMaximumSessionLocation;
+    private int         maximumSessionDuration = 0;
+    private short       status;
 
     public static final short  IS_ACTIVE    = 1;
     public static final short  IS_OFF       = 2;
@@ -61,17 +61,17 @@ public class BTDevice {
             this.maxRSSI = bt.maxRSSI;
 
         this.stopCurrentSessionLocation = new Location(ll);
-        this.stopCurrentSessionDate = new Date(lc.getTime());
+        this.stopCurrentSessionDate     = new Date(lc.getTime());
     }
 
     public BTDevice(String address,  Date date, Location lastKnownLocation, int rssi) {
-        this.firstContactDate = new Date(date.getTime());
-        this.stopCurrentSessionDate = new Date(date.getTime());
-        this.stopCurrentSessionLocation = new Location(lastKnownLocation);
-        this.maxRSSI = rssi;
-        this.address = new String(address);
-        this.startCurrentSessionDate = new Date(date.getTime());
-        this.startCurrentSessionLocation = new Location(lastKnownLocation);
+        this.firstContactDate               = new Date(date.getTime());
+        this.stopCurrentSessionDate         = new Date(date.getTime());
+        this.stopCurrentSessionLocation     = new Location(lastKnownLocation);
+        this.maxRSSI                        = rssi;
+        this.address                        = new String(address);
+        this.startCurrentSessionDate        = new Date(date.getTime());
+        this.startCurrentSessionLocation    = new Location(lastKnownLocation);
 
     }
 
@@ -82,11 +82,11 @@ public class BTDevice {
         this.address = new String(bt.address);
         this.maxRSSI = bt.maxRSSI;
 
-        this.stopCurrentSessionDate     = new Date(bt.stopCurrentSessionDate.getTime());
-        this.stopCurrentSessionLocation = new Location(bt.stopCurrentSessionLocation);
+        this.stopCurrentSessionDate         = new Date(bt.stopCurrentSessionDate.getTime());
+        this.stopCurrentSessionLocation     = new Location(bt.stopCurrentSessionLocation);
 
-        this.startCurrentSessionDate    = new Date(bt.startCurrentSessionDate.getTime());
-        this.startCurrentSessionLocation = new Location(bt.startCurrentSessionLocation);
+        this.startCurrentSessionDate        = new Date(bt.startCurrentSessionDate.getTime());
+        this.startCurrentSessionLocation    = new Location(bt.startCurrentSessionLocation);
 
     }
 
@@ -96,17 +96,17 @@ public class BTDevice {
         long timeout = (new Date().getTime() - this.stopCurrentSessionDate.getTime())/1000;
         if(timeout > SESSION_LIFETIME)
         {
-            this.startCurrentSessionDate = new Date();
-            this.startCurrentSessionLocation = bt.stopCurrentSessionLocation;
-            this.currentSessionDuration = 0;
+            this.startCurrentSessionDate        = new Date();
+            this.startCurrentSessionLocation    = bt.stopCurrentSessionLocation;
+            this.currentSessionDuration         = 0;
         }
         else
         {
-            this.startCurrentSessionDate = new Date(bt.startCurrentSessionDate.getTime());
-            this.startCurrentSessionLocation = new Location(bt.startCurrentSessionLocation);
+            this.startCurrentSessionDate        = new Date(bt.startCurrentSessionDate.getTime());
+            this.startCurrentSessionLocation    = new Location(bt.startCurrentSessionLocation);
         }
 
-        this.stopCurrentSessionDate = new Date(bt.stopCurrentSessionDate.getTime());
+        this.stopCurrentSessionDate     = new Date(bt.stopCurrentSessionDate.getTime());
         this.stopCurrentSessionLocation = new Location(bt.stopCurrentSessionLocation);
         this.maxRSSI = bt.maxRSSI;
         this.address = bt.address;
@@ -120,11 +120,11 @@ public class BTDevice {
 
         if(currentSessionDuration > maximumSessionDuration)
         {
-            this.maximumSessionDuration = currentSessionDuration;
-            this.startMaximumSessionDate = this.startCurrentSessionDate;
-            this.stopMaximumSessionDate = this.stopCurrentSessionDate;
-            this.stopMaximumSessionLocation = this.stopCurrentSessionLocation;
-            this.startMaximumSessionLocation = this.startCurrentSessionLocation;
+            this.maximumSessionDuration         = currentSessionDuration;
+            this.startMaximumSessionDate        = this.startCurrentSessionDate;
+            this.stopMaximumSessionDate         = this.stopCurrentSessionDate;
+            this.stopMaximumSessionLocation     = this.stopCurrentSessionLocation;
+            this.startMaximumSessionLocation    = this.startCurrentSessionLocation;
         }
 
     }
@@ -134,21 +134,21 @@ public class BTDevice {
     {
         String text =
                 "MAC address" + getAddress() + "\n" +
-                "First detectd at: " + getAddress() + "\n" +
-                "Start session date: " + getStartCurrentSessionDate().toString() +"\n" +
-                "Stop session date: " + getStopCurrentSessionDate().toString() +"\n" +
-                "Start session location: " + getStartCurrentSessionLocation().getLatitude() + " " + getStartCurrentSessionLocation().getLongitude() + "\n" +
-                "Stop session location: " + getStopCurrentSessionLocation().getLatitude() + " " + getStopCurrentSessionLocation().getLongitude() +"\n" +
-                "Current session time: " + getCurrentSessionDuration() + " seconds\n";
+                        "First detected at: " + getAddress() + "\n" +
+                        "Start session date: " + getStartCurrentSessionDate().toString() +"\n" +
+                        "Stop session date: " + getStopCurrentSessionDate().toString() +"\n" +
+                        "Start session location: " + getStartCurrentSessionLocation().getLatitude() + " " + getStartCurrentSessionLocation().getLongitude() + "\n" +
+                        "Stop session location: " + getStopCurrentSessionLocation().getLatitude() + " " + getStopCurrentSessionLocation().getLongitude() +"\n" +
+                        "Current session time: " + getCurrentSessionDuration() + " seconds\n";
 
         if(maximumSessionDuration > 0)
         {
             text +=
-                "Start MAX session date: " + startMaximumSessionDate.toString() +"\n" +
-                "Stop MAX session date: " + stopMaximumSessionDate.toString() +"\n" +
-                "Start MAX session location: " + startMaximumSessionLocation.getLatitude() + " " + startMaximumSessionLocation.getLongitude() + "\n" +
-                "Stop MAX session location: " + stopMaximumSessionLocation.getLatitude() + " " + stopMaximumSessionLocation.getLongitude() +"\n" +
-                "MAX session time " + maximumSessionDuration + " seconds\n";
+                    "Start MAX session date: " + startMaximumSessionDate.toString() +"\n" +
+                            "Stop MAX session date: " + stopMaximumSessionDate.toString() +"\n" +
+                            "Start MAX session location: " + startMaximumSessionLocation.getLatitude() + " " + startMaximumSessionLocation.getLongitude() + "\n" +
+                            "Stop MAX session location: " + stopMaximumSessionLocation.getLatitude() + " " + stopMaximumSessionLocation.getLongitude() +"\n" +
+                            "MAX session time " + maximumSessionDuration + " seconds\n";
         }
 
         return text;

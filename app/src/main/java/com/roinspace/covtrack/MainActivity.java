@@ -18,14 +18,16 @@
 
 package com.roinspace.covtrack;
 
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,43 +35,40 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
+
 public class MainActivity extends AppCompatActivity {
 
-    private final static int        PERMISSION_ID       = 44;
-    public  final static String     RECEIVE_MAC_LIST    = "RECEIVE_MAC_LIST";
-    private final static int        LOCATION_PERMISSION = 10;
-    private final static String     FILE_URL            = "http://covid19.roinspace.com/index.php?download=PATIENTS";
-    private final static boolean    HIDE_MAX_LIST       = false;
+    private final static int        PERMISSION_ID           = 44;
+    public  final static String     RECEIVE_MAC_LIST        = "RECEIVE_MAC_LIST";
+    private final static int        LOCATION_PERMISSION     = 10;
+    private final static String     FILE_URL                = "";
+    public final static String      START_FOREGROUND_ACTION = "START_FOREGROUND";
+    public final static String      STOP_FOREGROUND_ACTION  = "STOP_FOREGROUND";
+
+
+    private final String[] languages = {"English","Romana","Info"};
 
     private ArrayList<String>       listPermissions = new ArrayList<>();
     private IntentFilter            intentFilter    = new IntentFilter();
@@ -77,11 +76,11 @@ public class MainActivity extends AppCompatActivity {
     private LocalBroadcastManager   bManager;
     private Context                 context;
     private TextView                detectedDevicesTextView;
-    private ListView                listView;
-    private Button                  scanDatabaseBtn;
-    private Button                  viewStatisticsBtn;
-
-
+    private ImageButton             scanDatabaseBtn;
+    private ImageButton             viewStatisticsBtn;
+    private ImageButton             runScanBtn;
+    private ImageButton             languageBtn;
+    private ProgressDialog          progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,23 +89,123 @@ public class MainActivity extends AppCompatActivity {
 
         setupPermissions();
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_beta);
 
         detectedDevicesTextView = findViewById(R.id.textView_detect_device);
-        listView                = findViewById(R.id.listView);
         scanDatabaseBtn         = findViewById(R.id.databaseBtn);
         viewStatisticsBtn       = findViewById(R.id.verifyBtn);
+        runScanBtn              = findViewById(R.id.button2);
+        languageBtn             = findViewById(R.id.button3);
 
-        detectedDevicesTextView.setText(Globals.getStringInLocale("text_detected_devices_brief",this));
-        scanDatabaseBtn.setText(Globals.getStringInLocale("button_verify_db", this));
-        viewStatisticsBtn.setText(Globals.getStringInLocale("button_verify_stat", this));
+        languageBtn.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setItems(languages, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        switch(item) {
+                            case 0: {
+                                Globals.LANGUAGE = "en";
+                                dbUtil databaseConn = new dbUtil(getApplicationContext());
+                                databaseConn.setAppLanguage(Globals.LANGUAGE);
+                                databaseConn.close();
+                                recreate();
+                            }
+                            break;
+                            case 1: {
+                                Globals.LANGUAGE = "ro";
+                                dbUtil databaseConn = new dbUtil(getApplicationContext());
+                                databaseConn.setAppLanguage(Globals.LANGUAGE);
+                                databaseConn.close();
+                                recreate();
+                            }
+                            break;
+                            case 2:{
+                                Intent infoActivityIntent = new Intent(context,InfoActivity.class);
+                                startActivity(infoActivityIntent);
+                            }
+                        }
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
+
+        if(isBluetoothServiceRunning("com.roinspace.covtrack.BluetoothService"))
+        {
+            runScanBtn.setImageResource(R.drawable.stop_scan_btn);
+            String text = Globals.getStringInLocale("bluetooth_name",context) + BluetoothAdapter.getDefaultAdapter().getName() + "\n";
+            text+= Globals.getStringInLocale("text_scanning_devices_brief",context) +" ";
+            text+=String.valueOf(BluetoothService.mBTDeviceList.size()) + " "+Globals.getStringInLocale("device_placeholder",context);
+            detectedDevicesTextView.setText(text);
+        }
+        else
+        {
+            runScanBtn.setImageResource(R.drawable.start_scan_btn);
+            String text = Globals.getStringInLocale("bluetooth_name",context) + BluetoothAdapter.getDefaultAdapter().getName() + "\n";
+            text+= Globals.getStringInLocale("text_no_scanning_devices_brief",context);
+            detectedDevicesTextView.setText(text);
+        }
+
+        runScanBtn.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                if(isBluetoothServiceRunning("com.roinspace.covtrack.BluetoothService"))
+                {
+                    String text = Globals.getStringInLocale("bluetooth_name",context) + BluetoothAdapter.getDefaultAdapter().getName() + "\n";
+                    text+= Globals.getStringInLocale("text_no_scanning_devices_brief",context);
+                    detectedDevicesTextView.setText(text);
+                    runScanBtn.setImageResource(R.drawable.start_scan_btn);
+                    stopBluetoothService();
+                }
+                else
+                {
+                    String text = Globals.getStringInLocale("bluetooth_name",context) + BluetoothAdapter.getDefaultAdapter().getName() + "\n";
+                    text+= Globals.getStringInLocale("text_scanning_devices_brief",context) +" ";
+                    text+=String.valueOf(BluetoothService.mBTDeviceList.size()) + " "+Globals.getStringInLocale("device_placeholder",context);
+                    detectedDevicesTextView.setText(text);
+                    runScanBtn.setImageResource(R.drawable.stop_scan_btn);
+                    startBluetoothService();
+                }
+            }
+        });
+
+
+
+        if(Globals.LANGUAGE.compareTo("ro") == 0)
+        {
+            scanDatabaseBtn.setImageResource(R.drawable.database_btn_selector_ro);
+            viewStatisticsBtn.setImageResource(R.drawable.statistics_btn_selector_ro);
+        }
+        else
+        {
+            scanDatabaseBtn.setImageResource(R.drawable.database_btn_selector_en);
+            viewStatisticsBtn.setImageResource(R.drawable.statistics_btn_selector_en);
+        }
+
+
 
         scanDatabaseBtn.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                verifyDatabase();
+                if(!isNetworkAvailable())
+                {
+                    displayAlertNoInternet();
+                    return;
+                }
+
+                progressBar = new ProgressDialog(v.getContext());
+                progressBar.setCancelable(true);
+                progressBar.setMessage("File downloading ...");
+                progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                progressBar.setIndeterminate(true);
+                progressBar.show();
+
+                verifyFirebase();
             }
         });
 
@@ -120,14 +219,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        startBluetoothService();
 
         bManager = LocalBroadcastManager.getInstance(this);
         intentFilter.addAction(RECEIVE_MAC_LIST);
         bManager.registerReceiver(bReceiver, intentFilter);
 
-        if(BluetoothService.mBTDeviceList.size() > 0)
-            listView.setAdapter(new BTDeviceAdapter(context, BluetoothService.mBTDeviceList));
     }
 
     @Override
@@ -152,8 +248,6 @@ public class MainActivity extends AppCompatActivity {
 
         checkLocationAvailability();
 
-        if(BluetoothService.mBTDeviceList.size() > 0)
-            listView.setAdapter(new BTDeviceAdapter(context, BluetoothService.mBTDeviceList));
     }
 
     @Override
@@ -161,25 +255,87 @@ public class MainActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
-    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(RECEIVE_MAC_LIST)) {
-                if(HIDE_MAX_LIST)
-                    return;
+    private boolean isBluetoothServiceRunning(String serviceName){
 
-                listView.setAdapter(new BTDeviceAdapter(context, BluetoothService.mBTDeviceList));
+        boolean serviceRunning  = false;
+        ActivityManager am      = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
 
+        List<ActivityManager.RunningServiceInfo> l      = am.getRunningServices(50);
+        Iterator<ActivityManager.RunningServiceInfo> it = l.iterator();
+
+        while (it.hasNext()) {
+            ActivityManager.RunningServiceInfo runningServiceInfo = it
+                    .next();
+
+            if(runningServiceInfo.service.getClassName().equals(serviceName)){
+                serviceRunning = true;
+
+                if(runningServiceInfo.foreground)
+                {
+                    //service run in foreground
+                }
             }
+        }
+        return serviceRunning;
+    }
+
+        private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(intent.getAction().equals(RECEIVE_MAC_LIST)) {
+
+                    String text = Globals.getStringInLocale("bluetooth_name",context) + BluetoothAdapter.getDefaultAdapter().getName() + "\n";
+                    text+= Globals.getStringInLocale("text_scanning_devices_brief",context) +" ";
+                    text+=String.valueOf(BluetoothService.mBTDeviceList.size()) + " "+Globals.getStringInLocale("device_placeholder",context);
+                    detectedDevicesTextView.setText(text);
+                }
+            }
+        };
+
+    FirebaseUtil.DatabasePatientsListener callback = new FirebaseUtil.DatabasePatientsListener() {
+        @Override
+        public void onReceivePatientsSuccess(Vector<String> patients) {
+            dbUtil db = new dbUtil(context);
+            ArrayList<DeviceDBModel> infectedPatients = db.getDevices(patients);
+
+            db.close();
+            progressBar.dismiss();
+            if(infectedPatients.size() == 0)
+                displayAlertNotInfected();
+            else
+            {
+                displayAlertInfected(infectedPatients);
+            }
+        }
+
+        @Override
+        public void onReceivePatientsFailed() {
+            displayDBError();
         }
     };
 
     void startBluetoothService() {
-        if (Build.VERSION.SDK_INT >= 26){
-            startForegroundService(new Intent(this, BluetoothService.class));
+        Intent startIntent = new Intent(this, BluetoothService.class);
+        startIntent.setAction(START_FOREGROUND_ACTION);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+
+            startForegroundService(startIntent);
         } else{
-            startService(new Intent(this, BluetoothService.class));
+            startService(startIntent);
         }
+    }
+
+    void stopBluetoothService() {
+
+        Intent stopIntent = new Intent(this, BluetoothService.class);
+
+        stopIntent.setAction(STOP_FOREGROUND_ACTION);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            startForegroundService(stopIntent);
+        else
+            startService(stopIntent);
+
     }
 
     void checkLocationAvailability() {
@@ -195,6 +351,12 @@ public class MainActivity extends AppCompatActivity {
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
+    private void verifyFirebase() {
+
+        FirebaseUtil.getPatients(callback);
     }
 
     private void verifyDatabase() {
@@ -297,6 +459,29 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    void displayAlertInfected(final ArrayList<DeviceDBModel> infectedPatients) {
+        TextView textView = new TextView(context);
+        textView.setText(Globals.getStringInLocale("title_interact", this));
+        textView.setPadding(40, 30, 20, 30);
+        textView.setTextSize(17F);
+        textView.setBackgroundColor(Color.WHITE);
+        textView.setTextColor(Color.BLACK);
+
+        new AlertDialog.Builder(context)
+                .setCustomTitle(textView)
+                .setMessage(Globals.getStringInLocale("text_interact", this))
+                .setCancelable(false)
+                .setPositiveButton(Globals.getStringInLocale("verify_list",this), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(context, InfectedPatientsActivity.class);
+                        intent.putParcelableArrayListExtra(InfectedPatientsActivity.RECEIVE_PATIENT_LIST,infectedPatients);
+                        startActivity(intent);
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
     void displayAlertNotInfected() {
         TextView textView = new TextView(context);
         textView.setText(Globals.getStringInLocale("title_no_interact", this));
@@ -350,9 +535,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                listPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-            }
+
             if (checkSelfPermission(Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) {
                 listPermissions.add(Manifest.permission.FOREGROUND_SERVICE);
             }
@@ -362,6 +545,17 @@ public class MainActivity extends AppCompatActivity {
             if (!listPermissions.isEmpty()) {
                 requestPermissions(listPermissions.toArray(new String[listPermissions.size()]), LOCATION_PERMISSION);
 
+            }
+        }
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Intent intent = new Intent();
+            String packageName = getPackageName();
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                intent.setData(Uri.parse("package:" + packageName));
+                startActivity(intent);
             }
         }
 

@@ -1,94 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:isScrollContainer="true"
-    android:nestedScrollingEnabled="false"
-    android:scrollbars="vertical"
+    android:background="@drawable/background"
     tools:context=".MainActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView_detect_device"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/open_sans_regular"
+            android:gravity="start"
+            android:text="TextView" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/button3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:gravity="end"
+            android:scaleType="fitCenter"
+
+            android:src="@drawable/settings_btn"
+            android:text="" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:src="@drawable/start_scan_btn"
+            android:text="Button" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="335dp"
-            android:layout_height="136dp"
-            android:alpha="0.3"
-            android:src="@drawable/powered_by_rise"
-            app:layout_constraintBottom_toBottomOf="@+id/scrollViewMain"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <ScrollView
-            android:id="@+id/scrollViewMain"
             android:layout_width="match_parent"
-            android:layout_height="483dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="match_parent"
+            android:alpha="0.3"
+            android:scaleType="fitCenter"
+            android:src="@drawable/rise_logo" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+    </LinearLayout>
 
-                <ListView
-                    android:id="@+id/mainList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:isScrollContainer="true"
-                    />
-            </LinearLayout>
-        </ScrollView>
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
 
-        <Button
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <ImageButton
             android:id="@+id/databaseBtn"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="74dp"
-            android:text="Verifica baza de date"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/scrollViewMain" />
+            android:layout_marginTop="32dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:src="@drawable/database_btn_selector_en"
+            android:text="" />
 
-        <Button
+        <ImageButton
             android:id="@+id/verifyBtn"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="74dp"
-            android:text="Verifica statistici"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/databaseBtn" />
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:src="@drawable/statistics_btn_selector_en"
+            android:text="" />
 
-        <ScrollView
-            android:id="@+id/scrollView2"
-            android:layout_width="409dp"
-            android:layout_height="415dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/verifyBtn">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <ListView
-                    android:id="@+id/listView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </LinearLayout>
-        </ScrollView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+    </LinearLayout>
 
 
-
-
-
-
+</androidx.constraintlayout.widget.ConstraintLayout>

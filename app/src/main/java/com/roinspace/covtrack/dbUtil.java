@@ -35,32 +35,35 @@ import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 public class dbUtil extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 3;
-    private static final int TIME_INTERVAL_TIMEOUT = 10*60;
-    private static final String DATABASE_NAME = "covid19_db";
+
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "main_database";
+
     private static final String MAIN_TABLE = "devices";
-    private static final String KEY_ID = "id";
+
+    private static final String KEY_ID  = "id";
     private static final String KEY_MAC = "mac";
 
-    private static final String KEY_TIME = "timestamp";
-    private static final String KEY_TIME_INTERVAL = "time_interval";
-    private static final String KEY_MAX_TIME_INTERVAL = "max_time_interval";
-
-    private static final String KEY_START_CURRENT_SESSION_DATE =   "start_current_session_date";
-    private static final String KEY_STOP_CURRENT_SESSION_DATE =   "stop_current_session_date";
-    private static final String KEY_START_CURRENT_SESSION_LATITUDE =   "start_current_session_latitude";
+    private static final String KEY_START_CURRENT_SESSION_DATE      =   "start_current_session_date";
+    private static final String KEY_STOP_CURRENT_SESSION_DATE       =   "stop_current_session_date";
+    private static final String KEY_START_CURRENT_SESSION_LATITUDE  =   "start_current_session_latitude";
     private static final String KEY_START_CURRENT_SESSION_LONGITUDE =   "start_current_session_longitude";
-    private static final String KEY_STOP_CURRENT_SESSION_LATITUDE =   "stop_current_session_latitude";
-    private static final String KEY_STOP_CURRENT_SESSION_LONGITUDE =   "stop_current_session_longitude";
-    private static final String KEY_CURRENT_SESSION_DURATION =    "current_session_duration";
+    private static final String KEY_STOP_CURRENT_SESSION_LATITUDE   =   "stop_current_session_latitude";
+    private static final String KEY_STOP_CURRENT_SESSION_LONGITUDE  =   "stop_current_session_longitude";
+    private static final String KEY_CURRENT_SESSION_DURATION        =   "current_session_duration";
 
-    private static final String KEY_START_MAX_SESSION_DATE =   "start_max_session_date";
-    private static final String KEY_STOP_MAX_SESSION_DATE =   "stop_max_session_date";
-    private static final String KEY_START_MAX_SESSION_LATITUDE =   "start_max_session_latitude";
+    private static final String KEY_START_MAX_SESSION_DATE      =   "start_max_session_date";
+    private static final String KEY_STOP_MAX_SESSION_DATE       =   "stop_max_session_date";
+    private static final String KEY_START_MAX_SESSION_LATITUDE  =   "start_max_session_latitude";
     private static final String KEY_START_MAX_SESSION_LONGITUDE =   "start_max_session_longitude";
-    private static final String KEY_STOP_MAX_SESSION_LATITUDE =   "stop_max_session_latitude";
-    private static final String KEY_STOP_MAX_SESSION_LONGITUDE =   "stop_max_session_longitude";
-    private static final String KEY_MAX_SESSION_DURATION =    "max_session_duration";
+    private static final String KEY_STOP_MAX_SESSION_LATITUDE   =   "stop_max_session_latitude";
+    private static final String KEY_STOP_MAX_SESSION_LONGITUDE  =   "stop_max_session_longitude";
+    private static final String KEY_MAX_SESSION_DURATION        =   "max_session_duration";
+
+    private static final String LANGUAGE_TABLE = "language";
+
+    private static final String KEY_LANGUAGE        = "language";
+    private static final String KEY_LANGUAGE_UNIQUE = "type";
 
     private static final String DEVICES_TABLE_STRUCTURE = KEY_MAC+"`," +
             "`"+KEY_START_CURRENT_SESSION_DATE+"`," +
@@ -86,28 +89,10 @@ public class dbUtil extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        switch(DATABASE_VERSION)
-        {
-            case 1: {
-                String CREATE_CONTACTS_TABLE = "CREATE TABLE " + MAIN_TABLE + "(" +
-                        KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        KEY_MAC + " TEXT UNIQUE," +
-                        KEY_TIME + " TEXT," +
-                        KEY_TIME_INTERVAL + " INTEGER"+")";
-                db.execSQL(CREATE_CONTACTS_TABLE);
-            }break;
-            case 2: {
+        switch(DATABASE_VERSION) {
 
-                String CREATE_CONTACTS_TABLE = "CREATE TABLE " + MAIN_TABLE + "(" +
-                        KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        KEY_MAC + " TEXT UNIQUE," +
-                        KEY_TIME + " TEXT," +
-                        KEY_TIME_INTERVAL + " INTEGER,"+
-                        KEY_MAX_TIME_INTERVAL+ " INTEGER"+")";
-                db.execSQL(CREATE_CONTACTS_TABLE);
-            }
-            break;
-            case 3: {
+            case 1: {
+
                 String CREATE_CONTACTS_TABLE = "CREATE TABLE " + MAIN_TABLE + "(" +
                         KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         KEY_MAC + " TEXT UNIQUE," +
@@ -126,16 +111,19 @@ public class dbUtil extends SQLiteOpenHelper {
                         KEY_STOP_MAX_SESSION_LONGITUDE +" REAL," +
                         KEY_MAX_SESSION_DURATION +" INTEGER" +")";
                 db.execSQL(CREATE_CONTACTS_TABLE);
+
+                String CREATE_LANGUAGE_TABLE = "CREATE TABLE " + LANGUAGE_TABLE + "(" +
+                        KEY_LANGUAGE_UNIQUE + " TEXT UNIQUE," +
+                        KEY_LANGUAGE + " TEXT"+ ")";
+                db.execSQL(CREATE_LANGUAGE_TABLE);
             }
         }
-
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         db.execSQL("DROP TABLE IF EXISTS " + MAIN_TABLE);
-
         onCreate(db);
     }
 
@@ -143,17 +131,51 @@ public class dbUtil extends SQLiteOpenHelper {
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         db.execSQL("DROP TABLE IF EXISTS " + MAIN_TABLE);
-
         onCreate(db);
     }
 
-    void addSingleDevice(BTDevice device) {
+    void setAppLanguage(String language) {
+
         SQLiteDatabase db = this.getWritableDatabase();
-        String sqlCommand = "";
-        String subSqlCommand = "";
+
+        String sqlCommand = "INSERT OR REPLACE INTO "+LANGUAGE_TABLE+" (`type`,`language`) VALUES ('language','"+language+"');";
+        db.execSQL(sqlCommand);
+
+        db.close();
+    }
+
+    String getAppLanguage() {
+
+        String result       =  null;
+        String sqlCommand   = "";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+
+        sqlCommand = "SELECT * FROM "+LANGUAGE_TABLE+";";
+        Cursor resultSet = db.rawQuery(sqlCommand, null);
+
+        if(resultSet.getCount() > 0) {
+            resultSet.moveToFirst();
+            result = resultSet.getString(resultSet.getColumnIndex(KEY_LANGUAGE));
+        }
+
+        resultSet.close();
+        db.close();
+
+        return result;
+    }
+
+    void addSingleDevice(BTDevice device) {
+
+        String sqlCommand       = "";
+        String subSqlCommand    = "";
+        Cursor resultSet        = null;
+
+        SQLiteDatabase db = this.getWritableDatabase();
 
         sqlCommand = "SELECT "+KEY_MAX_SESSION_DURATION+" FROM "+MAIN_TABLE+" WHERE "+KEY_MAC+" ='" + device.getAddress() +"';";
-        Cursor resultSet = db.rawQuery(sqlCommand, null);
+        resultSet = db.rawQuery(sqlCommand, null);
 
         if(resultSet.moveToNext() == false)
         {
@@ -180,21 +202,21 @@ public class dbUtil extends SQLiteOpenHelper {
             sqlCommand = "INSERT OR REPLACE INTO "+MAIN_TABLE+" " +
                     "(`"+ DEVICES_TABLE_STRUCTURE +
                     ") VALUES "+subSqlCommand+";";
-            try{
+            try {
                 db.execSQL(sqlCommand);
-            }catch (SQLException e)
-            {
+            } catch (SQLException e)  {
                 e.printStackTrace();
             }
 
             resultSet.close();
             db.close();
+
             return;
         }
-
-
+        
         resultSet.moveToFirst();
         int lastMaximumSessionDuration = resultSet.getInt(0);
+        resultSet.close();
 
         if(lastMaximumSessionDuration < device.getMaximumSessionDuration())
         {
@@ -221,20 +243,17 @@ public class dbUtil extends SQLiteOpenHelper {
             sqlCommand = "INSERT OR REPLACE INTO "+MAIN_TABLE+" " +
                     "(`"+ DEVICES_TABLE_STRUCTURE +
                     ") VALUES "+subSqlCommand+";";
-            try{
+            try {
                 db.execSQL(sqlCommand);
-            }catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
-
-            db.close();
         }
         else
         {
             sqlCommand = "SELECT * FROM "+MAIN_TABLE+" WHERE "+KEY_MAC+" ='" + device.getAddress() +"';";
-            Cursor resultSet1 = db.rawQuery(sqlCommand, null);
-            resultSet1.moveToFirst();
+            resultSet = db.rawQuery(sqlCommand, null);
+            resultSet.moveToFirst();
 
             subSqlCommand = subSqlCommand.concat("('"+
                     device.getAddress()+"','"+
@@ -245,37 +264,35 @@ public class dbUtil extends SQLiteOpenHelper {
                     device.getStopCurrentSessionLocation().getLongitude()+"','"+
                     device.getStopCurrentSessionLocation().getLatitude()+"','"+
                     device.getCurrentSessionDuration()+"','"+
-                    resultSet1.getString(resultSet1.getColumnIndex(KEY_START_MAX_SESSION_DATE))+"','"+
-                    resultSet1.getString(resultSet1.getColumnIndex(KEY_STOP_MAX_SESSION_DATE))+"','"+
-                    resultSet1.getString(resultSet1.getColumnIndex(KEY_START_MAX_SESSION_LATITUDE))+"','"+
-                    resultSet1.getString(resultSet1.getColumnIndex(KEY_START_MAX_SESSION_LONGITUDE))+"','"+
-                    resultSet1.getString(resultSet1.getColumnIndex(KEY_STOP_MAX_SESSION_LATITUDE))+"','"+
-                    resultSet1.getString(resultSet1.getColumnIndex(KEY_STOP_MAX_SESSION_LONGITUDE))+"','"+
-                    resultSet1.getString(resultSet1.getColumnIndex(KEY_MAX_SESSION_DURATION))+
+                    resultSet.getString(resultSet.getColumnIndex(KEY_START_MAX_SESSION_DATE))+"','"+
+                    resultSet.getString(resultSet.getColumnIndex(KEY_STOP_MAX_SESSION_DATE))+"','"+
+                    resultSet.getString(resultSet.getColumnIndex(KEY_START_MAX_SESSION_LATITUDE))+"','"+
+                    resultSet.getString(resultSet.getColumnIndex(KEY_START_MAX_SESSION_LONGITUDE))+"','"+
+                    resultSet.getString(resultSet.getColumnIndex(KEY_STOP_MAX_SESSION_LATITUDE))+"','"+
+                    resultSet.getString(resultSet.getColumnIndex(KEY_STOP_MAX_SESSION_LONGITUDE))+"','"+
+                    resultSet.getString(resultSet.getColumnIndex(KEY_MAX_SESSION_DURATION))+
                     "')");
-            resultSet1.close();
 
             sqlCommand = "INSERT OR REPLACE INTO "+MAIN_TABLE+" " +
                     "(`"+ DEVICES_TABLE_STRUCTURE +
                     ") VALUES "+subSqlCommand+";";
 
-            try{
+            try {
                 db.execSQL(sqlCommand);
-            }catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
-            resultSet.close();
-            db.close();
         }
-
-
+        db.close();
     }
 
     void addDevices(HashMap<String, BTDevice> devices) {
+
+        String sqlCommand       = "";
+        String subSqlCommand    = "";
+
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String subSqlCommand = "";
 
         for(Map.Entry<String, BTDevice> entry : devices.entrySet()) {
             String mac = entry.getKey();
@@ -302,35 +319,38 @@ public class dbUtil extends SQLiteOpenHelper {
         }
         subSqlCommand = subSqlCommand.substring(0, subSqlCommand.length() - 1);
 
-        String sqlCommand = "INSERT OR REPLACE INTO "+MAIN_TABLE+" " +
+        sqlCommand = "INSERT OR REPLACE INTO "+MAIN_TABLE+" " +
                 "(`"+ DEVICES_TABLE_STRUCTURE +
                 ") VALUES "+subSqlCommand+";";
-
         db.execSQL(sqlCommand);
 
         db.close();
     }
 
     HashMap<String,String> getDevicesInfo(Vector<String> macList) {
+
+        String sqlCommand       = "";
+        String subSqlCommand    = "";
+        Cursor resultSet        = null;
+
         SQLiteDatabase db = this.getWritableDatabase();
 
         HashMap<String, String> devicesInfo = new HashMap<>();
 
-        String subSqlCommand = "(";
+        subSqlCommand = "(";
         for(int i = 0; i < macList.size()-1; i++) {
             subSqlCommand = subSqlCommand.concat("'"+macList.elementAt(i)+"',");
         }
         subSqlCommand = subSqlCommand.concat("'"+macList.elementAt(macList.size()-1)+"')");
 
-        String sqlCommand = "SELECT * FROM "+MAIN_TABLE+" WHERE `mac` IN "+subSqlCommand+";";
-        Cursor resultSet = db.rawQuery(sqlCommand, null);
+        sqlCommand = "SELECT * FROM "+MAIN_TABLE+" WHERE `mac` IN "+subSqlCommand+";";
+        resultSet = db.rawQuery(sqlCommand, null);
         while(resultSet.moveToNext()) {
             String mac = resultSet.getString(resultSet.getColumnIndex(KEY_MAC));
 
 
             String deviceInfo = "";
             deviceInfo += resultSet.getString(resultSet.getColumnIndex(KEY_MAC)) + "\n" +
-
                    /* "Start curr " + resultSet.getString(resultSet.getColumnIndex(KEY_START_CURRENT_SESSION_DATE)) +"\n" +
                     "Stop curr " + resultSet.getString(resultSet.getColumnIndex(KEY_STOP_CURRENT_SESSION_DATE)) +"\n" +
                     "session: " + resultSet.getString(resultSet.getColumnIndex(KEY_CURRENT_SESSION_DURATION)) + "\n"+*/
@@ -338,12 +358,12 @@ public class dbUtil extends SQLiteOpenHelper {
                     "Stop max" + resultSet.getString(resultSet.getColumnIndex(KEY_STOP_MAX_SESSION_DATE)) +"\n" +
                     "Max session: " + resultSet.getString(resultSet.getColumnIndex(KEY_MAX_SESSION_DURATION)) + "\n";
 
-
-            devicesInfo.put(mac,deviceInfo);
+            devicesInfo.put(mac, deviceInfo);
         }
-        resultSet.close();
 
+        resultSet.close();
         db.close();
+
         return devicesInfo;
     }
 
@@ -351,18 +371,23 @@ public class dbUtil extends SQLiteOpenHelper {
 
         if(macList.size() == 0)
             return new ArrayList<DeviceDBModel>();
+
+        String sqlCommand       = "";
+        String subSqlCommand    = "";
+        Cursor resultSet        = null;
+
         SQLiteDatabase db = this.getWritableDatabase();
 
         ArrayList<DeviceDBModel> devices = new ArrayList<>();
 
-        String subSqlCommand = "(";
+        subSqlCommand = "(";
         for(int i = 0; i < macList.size()-1; i++) {
             subSqlCommand = subSqlCommand.concat("'"+macList.elementAt(i)+"',");
         }
         subSqlCommand = subSqlCommand.concat("'"+macList.elementAt(macList.size()-1)+"')");
 
-        String sqlCommand = "SELECT * FROM "+MAIN_TABLE+" WHERE `mac` IN "+subSqlCommand+";";
-        Cursor resultSet = db.rawQuery(sqlCommand, null);
+        sqlCommand = "SELECT * FROM "+MAIN_TABLE+" WHERE `mac` IN "+subSqlCommand+";";
+        resultSet = db.rawQuery(sqlCommand, null);
         while(resultSet.moveToNext()) {
             String mac = resultSet.getString(resultSet.getColumnIndex(KEY_MAC));
 
@@ -383,170 +408,10 @@ public class dbUtil extends SQLiteOpenHelper {
 
             devices.add(device);
         }
-        resultSet.close();
 
+        resultSet.close();
         db.close();
+
         return devices;
-    }
-
-    @Deprecated
-    void addContact(HashMap<String, String> contact_list) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        String subSqlCommand = "";
-
-        for(Map.Entry<String, String> contact : contact_list.entrySet()) {
-            String mac = contact.getKey();
-            String timestamp = contact.getValue();
-
-            String sqlCommand = "SELECT timestamp FROM contacts WHERE mac ='" + mac +"';";
-            Cursor resultSet = db.rawQuery(sqlCommand, null);
-
-            if(resultSet.moveToNext() == false)
-            {
-                subSqlCommand = subSqlCommand.concat("('"+mac+"','"+timestamp+"','0','0'),");
-                continue;
-            }
-
-            resultSet.moveToFirst();
-            String lastTimestamp = resultSet.getString(0);
-
-            sqlCommand = "SELECT time_interval FROM contacts WHERE mac ='" + mac +"';";
-            resultSet = db.rawQuery(sqlCommand, null);
-
-            resultSet.moveToFirst();
-            int lastTimeInterval = resultSet.getInt(0);
-
-            if(getTimeDiff(timestamp,lastTimestamp) > TIME_INTERVAL_TIMEOUT)
-            {
-                sqlCommand = "SELECT max_time_interval FROM contacts WHERE mac ='" + mac +"';";
-                resultSet = db.rawQuery(sqlCommand, null);
-
-                resultSet.moveToFirst();
-                int maxTimeInterval = resultSet.getInt(0);
-                subSqlCommand = subSqlCommand.concat("('"+mac+"','"+timestamp+"','0','"+maxTimeInterval+"'),");
-            }
-            else
-            {
-                lastTimeInterval +=getTimeDiff(timestamp,lastTimestamp);
-
-                sqlCommand = "SELECT max_time_interval FROM contacts WHERE mac ='" + mac +"';";
-                resultSet = db.rawQuery(sqlCommand, null);
-
-                resultSet.moveToFirst();
-                int maxTimeInterval = resultSet.getInt(0);
-
-                if(maxTimeInterval < lastTimeInterval)
-                    maxTimeInterval = lastTimeInterval;
-
-                subSqlCommand = subSqlCommand.concat("('"+mac+"','"+timestamp+"','"+lastTimeInterval+"','"+maxTimeInterval+"'),");
-            }
-
-        }
-        subSqlCommand = subSqlCommand.substring(0, subSqlCommand.length() - 1);
-
-
-
-        String sqlCommand = "INSERT OR REPLACE INTO "+MAIN_TABLE+" (`mac`,`timestamp`,`time_interval`,`max_time_interval`) VALUES "+subSqlCommand+";";
-        db.execSQL(sqlCommand);
-
-        db.close();
-    }
-
-    @Deprecated
-    int getMaxTimeInterval(String mac) {
-        int result = 0;
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        Cursor resultSet = db.rawQuery("SELECT max_time_interval FROM "+MAIN_TABLE+" WHERE mac = '"+mac+"';",null);
-        while(resultSet.moveToNext()) {
-            result = resultSet.getInt(0);
-        }
-        resultSet.close();
-        db.close();
-
-        return result;
-    }
-
-    @Deprecated
-    long getTimeDiff(String currentTimestamp,String lastTimestamp) {
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyy' 'HH:mm:ss");
-        long diffInSec = 0;
-        try {
-            Date currentDate = format.parse(currentTimestamp);
-            Date lastDate = format.parse(lastTimestamp);
-
-            long diffInMs = currentDate.getTime() - lastDate.getTime();
-
-            diffInSec = TimeUnit.MILLISECONDS.toSeconds(diffInMs);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Log.d("TIME DIFF",String.valueOf(diffInSec));
-
-        return diffInSec;
-    }
-
-    @Deprecated
-    int countContacts(Vector<String> mac_list) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        int count;
-
-        String subSqlCommand = "(";
-        for(int i = 0; i < mac_list.size()-1; i++) {
-            subSqlCommand = subSqlCommand.concat("'"+mac_list.elementAt(i)+"',");
-        }
-        subSqlCommand = subSqlCommand.concat("'"+mac_list.elementAt(mac_list.size()-1)+"')");
-
-        String sqlCommand = "SELECT COUNT(*) FROM "+MAIN_TABLE+" WHERE `mac` IN "+subSqlCommand+";";
-        Cursor resultSet = db.rawQuery(sqlCommand, null);
-        resultSet.moveToFirst();
-        count = resultSet.getInt(0);
-        resultSet.close();
-
-        db.close();
-        return count;
-    }
-
-    @Deprecated
-    HashMap<String, String> getContacts(Vector<String> mac_list) {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        HashMap<String, String> contacts = new HashMap<>();
-
-        String subSqlCommand = "(";
-        for(int i = 0; i < mac_list.size()-1; i++) {
-            subSqlCommand = subSqlCommand.concat("'"+mac_list.elementAt(i)+"',");
-        }
-        subSqlCommand = subSqlCommand.concat("'"+mac_list.elementAt(mac_list.size()-1)+"')");
-
-        String sqlCommand = "SELECT * FROM "+MAIN_TABLE+" WHERE `mac` IN "+subSqlCommand+";";
-        Cursor resultSet = db.rawQuery(sqlCommand, null);
-        while(resultSet.moveToNext()) {
-            String mac = resultSet.getString(resultSet.getColumnIndex(KEY_MAC));
-            String timestamp = resultSet.getString(resultSet.getColumnIndex(KEY_TIME));
-            contacts.put(mac,timestamp);
-        }
-        resultSet.close();
-
-        db.close();
-        return contacts;
-    }
-
-    @Deprecated
-    void printContacts() {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        Cursor resultSet = db.rawQuery("SELECT * FROM "+MAIN_TABLE+";",null);
-        while(resultSet.moveToNext()) {
-            String id = resultSet.getString(0);
-            String mac = resultSet.getString(1);
-            String tstamp = resultSet.getString(2);
-            Log.e("DATABASE - ", "ID:"+id+" MAC:"+mac+" TStamp:"+tstamp);
-        }
-        resultSet.close();
-        db.close();
     }
 }

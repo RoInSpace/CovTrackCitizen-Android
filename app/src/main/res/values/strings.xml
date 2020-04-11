@@ -3,7 +3,9 @@
     <string name="title_activity_maps">Map</string>
 
 
-    <string name="text_detected_devices_brief_ro">Interactionati cu urmatoarele dispozitive</string>
+    <string name="text_scanning_devices_brief_ro">Interactionati cu </string>
+    <string name="device_placeholder_ro"> dispozitive</string>
+    <string name="text_no_scanning_devices_brief_ro">Nu detectati dispozitive.\nApasati butonul START SCAN</string>
     <string name="text_infected_devices_brief_ro">Urmatoarele dispozitive cu care ati interactionat \n sunt pacienti ce au fost infectati cu COVID-19.\n Mergeti sa faceti un control.</string>
     <string name="button_confirm_ro">Da</string>
     <string name="button_deny_ro">Nu</string>
@@ -24,6 +26,10 @@
     <string name="title_no_interact_ro">Nu ai interactionat pana acum cu pacienti</string>
     <string name="text_no_interact_ro">Esti in siguranta.</string>
 
+    <string name="title_interact_ro">Ati avut contact cu pacienti.</string>
+    <string name="text_interact_ro">Ati avut contact cu pacienti infectati cu COVID-19. Va rugam sa verificati lista acestora.</string>
+    <string name="verify_list_ro">Verifica lista pacientilor</string>
+
     <string name="title_no_network_ro">LIPSA INTERNET</string>
     <string name="text_no_network_ro">Va rugam sa va porniti datele mobile.</string>
 
@@ -34,7 +40,13 @@
     <string name="text_distance_close_ro">aproape</string>
     <string name="text_distance_far_ro">departe</string>
 
-    <string name="text_detected_devices_brief_en">You are detecting the following devices</string>
+    <string name="bluetooth_name_ro">Denumire dispozitiv: </string>
+    <string name="bluetooth_count_ro">Dispozitive detectate: </string>
+
+    <string name="text_scanning_devices_brief_en">Your are detecting </string>
+    <string name="device_placeholder_en"> devices</string>
+    <string name="text_no_scanning_devices_brief_en">The scanning is turned off.\nPress START SCAN.</string>
+
     <string name="text_infected_devices_brief_en">The following devices that you had contact \n are patients that are infected with COVID19.\n Go and test yourself.</string>
     <string name="button_confirm_en">Yes</string>
     <string name="button_deny_en">No</string>
@@ -50,10 +62,14 @@
     <string name="text_no_patient_location_en">For this patient the location is unavailable.</string>
 
     <string name="title_db_error_en">Connection to database refused.</string>
-    <string name="text_db_error_en">The connection to the database cannot be established. \nContact an administrator</string>
+    <string name="text_db_error_en">The connection to the database cannot be established. \nContact a administrator</string>
 
     <string name="title_no_interact_en">You have not met patients</string>
     <string name="text_no_interact_en">You are safe.</string>
+
+    <string name="title_interact_en">You have met patients.</string>
+    <string name="text_interact_en">You have encountered COVID-19 patients. Please check the list.</string>
+    <string name="verify_list_en">Verify patient\'s list</string>
 
     <string name="title_no_network_en">NO INTERNET CONNECTION</string>
     <string name="text_no_network_en">Please turn on mobile data.</string>
@@ -64,5 +80,17 @@
     <string name="text_distance_very_close_en">very close</string>
     <string name="text_distance_close_en">close</string>
     <string name="text_distance_far_en">far away</string>
+
+    <string name="bluetooth_name_en">Device name: </string>
+    <string name="bluetooth_count_en">Devices detected: </string>
+
+    <string name="info_text_ro">Aplicația monitorizează riscul de contractare a COVID-19, prin identificarea posibilităților de infectare definite ca potențial contact între o persoană confirmată cu infecția și persoanele care s-au aflat în imediata sa apropiere. Acest lucru se realizează prin stocarea dispozitivelor Bluetooth care se pot detecta reciproc dacă se află într-un cerc cu raza mai mică de 10m. În acest sens, aplicația are nevoie de permisiuni legate de Bluetooth și locație pentru a putea realiza monitorizarea. Verificarea și monitorizarea istoricului de interacțiune se face direct pe terminalul dumneavoastră.\n
+Interfața aplicației este centrată pe butonul de Pornire/Oprire a scanării de dispozitive Bluetooth adiacente. Căutarea și stocarea dispozitivelor cu care intrați în contact se face prin apăsarea butonului START SCAN, timp în care numărul de dispozitive detectate crește, formând o bază de date locală. După activare, acest buton se transformă într-un buton STOP SCAN.\n
+Butonul VERIFICĂ BAZA DE DATE face conexiunea cu serverul unde este ținută baza de date remote care include identificatoarele unice ale persoanelor confirmate că au fost infectate cu COVID-19. După ce descarcă toată lista, aplicația caută elemente comune cu lista din baza de date locală și returnează un mesaj de raport. Dacă ați identificat un potențial contact, vă puteți consulta cu autoritățile pentru a stabili dacă respectivul contact necesită includerea dumneavoastră între persoanele monitorizate, sau chiar testarea pentru COVID-19.
+    </string>
+    <string name="info_text_en">The application monitors the risk of contracting COVID-19, by identifying the possibilities of  infection defined as potential contact between a person confirmed with the infection and the people who were in their immediate vicinity. This is achieved by storing Bluetooth devices, which are mutually detectable if they are in a circle with a radius of less than 10m. In this regard, the application needs permissions related to Bluetooth and location in order to perform the monitoring. The verification and monitoring of the interaction history is done directly on your terminal.\n
+The application interface is centered on the on/off button for scanning adjacent Bluetooth devices. Searching and storing the devices you come into contact with is done by pressing the START SCAN button, during which operation the number of detected devices increases, making up a local database. After activation, this button turns into a STOP SCAN button.\n
+The CHECK DATABASE button connects the app to the server where the remote database is stored, which includes the unique identifiers of people confirmed to have been infected with COVID-19. After downloading the entire list, the application looks for common items in the local database and returns a report message. If you have identified a potential contact in your list, you can consult with the authorities to determine if that contact requires your inclusion among the monitored persons, or even testing for COVID-19.\n
+</string>
 
 </resources>

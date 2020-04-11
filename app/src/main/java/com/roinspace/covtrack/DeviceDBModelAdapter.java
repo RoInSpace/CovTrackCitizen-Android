@@ -36,63 +36,67 @@ import androidx.appcompat.app.AlertDialog;
 import java.util.ArrayList;
 
 public class DeviceDBModelAdapter extends ArrayAdapter<DeviceDBModel> {
-    ArrayList<DeviceDBModel> dbModelList;
+
     Context context;
+    ArrayList<DeviceDBModel> dbModelList;
 
     public DeviceDBModelAdapter(Context context, ArrayList<DeviceDBModel> arrayList) {
-        super(context,R.layout.list_row,arrayList);
-        this.dbModelList =arrayList;
-        this.context=context;
+        super(context, R.layout.list_row, arrayList);
+
+        this.context        = context;
+        this.dbModelList    = arrayList;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        DeviceDBModel btDeviceModel= dbModelList.get(position);
+        DeviceDBModel btDeviceModel = dbModelList.get(position);
 
         Log.d("getView",position+" "+btDeviceModel.macAddress);
-        if(convertView==null) {
+        if(convertView == null) {
 
             LayoutInflater layoutInflater = LayoutInflater.from(context);
-            convertView=layoutInflater.inflate(R.layout.list_row, null);
+            convertView = layoutInflater.inflate(R.layout.list_row, null);
             convertView.setOnClickListener(new CustomClickListener(btDeviceModel));
 
-            TextView tittle=convertView.findViewById(R.id.list_title);
-            TextView subTitle=convertView.findViewById(R.id.list_subtitle);
-            ImageView imag=convertView.findViewById(R.id.list_image);
-            imag.setImageResource(R.drawable.infected);
+            TextView tittle = convertView.findViewById(R.id.list_title);
+            TextView subTitle = convertView.findViewById(R.id.list_subtitle);
+
+
             tittle.setText(btDeviceModel.macAddress);
             String duration = Globals.getStringInLocale("text_duration", context);
             subTitle.setText(duration + ": " + btDeviceModel.sessionDuration + " s    ");
-
         }
         return convertView;
     }
 
-    class CustomClickListener implements View.OnClickListener
-    {
+    class CustomClickListener implements View.OnClickListener {
 
         DeviceDBModel btDeviceModel;
+
         public CustomClickListener(DeviceDBModel btDeviceModel) {
+
             this.btDeviceModel = btDeviceModel;
         }
 
         @Override
-        public void onClick(View v)
-        {
+        public void onClick(View v) {
+
             Intent intent = new Intent(context, MapsActivity.class);
-            if(btDeviceModel.sessionStopLocation == null || (btDeviceModel.sessionStopLocation.getLongitude() == 0 && btDeviceModel.sessionStopLocation.getLatitude() == 0))
-            {
+
+            if(btDeviceModel.sessionStopLocation == null || (btDeviceModel.sessionStopLocation.getLongitude() == 0 && btDeviceModel.sessionStopLocation.getLatitude() == 0)) {
+
                 displayPatientLocationUnavailable();
                 return;
             }
-            intent.putExtra("patient_location",btDeviceModel.sessionStopLocation);
+            intent.putExtra(MapsActivity.RECEIVE_PATIENT_LOCATION,btDeviceModel.sessionStopLocation);
             context.startActivity(intent);
         }
 
     };
 
     void displayPatientLocationUnavailable() {
+        
         TextView textView = new TextView(context);
         textView.setText(Globals.getStringInLocale("title_no_patient_location", context));
         textView.setPadding(40, 30, 20, 30);
@@ -139,13 +143,10 @@ public class DeviceDBModelAdapter extends ArrayAdapter<DeviceDBModel> {
     }
 
     @Override
-    public void registerDataSetObserver(DataSetObserver observer) {
-
-    }
+    public void registerDataSetObserver(DataSetObserver observer) { }
 
     @Override
-    public void unregisterDataSetObserver(DataSetObserver observer) {
-    }
+    public void unregisterDataSetObserver(DataSetObserver observer) { }
 
     @Override
     public int getCount() {

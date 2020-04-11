@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    public static String RECEIVE_PATIENT_LOCATION = "receive_patient_location";
     private GoogleMap   mMap;
     private LatLng      patientLocation;
 
@@ -47,7 +48,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         if (extras != null) {
-            Location receivedLocation = (Location)extras.getParcelable("patient_location");
+            Location receivedLocation = (Location)extras.getParcelable(RECEIVE_PATIENT_LOCATION);
             patientLocation =  new LatLng(receivedLocation.getLatitude(),receivedLocation.getLongitude());
         }
     }

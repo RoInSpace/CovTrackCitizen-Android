@@ -37,6 +37,7 @@ public class DeviceDBModel implements Parcelable {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
+
                 dest.writeString(macAddress);
                 dest.writeString(sessionStartDate);
                 dest.writeString(sessionStopDate);
@@ -45,29 +46,29 @@ public class DeviceDBModel implements Parcelable {
                 dest.writeInt(sessionDuration);
         }
 
-        public DeviceDBModel() {
-
-        }
+        public DeviceDBModel() { }
 
         public DeviceDBModel(Parcel in) {
-                this.macAddress = in.readString();
-                this.sessionStartDate = in.readString();
-                this.sessionStopDate = in.readString();
-                this.sessionStartLocation=Location.CREATOR.createFromParcel(in);
-                this.sessionStopLocation=Location.CREATOR.createFromParcel(in);
-                this.sessionDuration = in.readInt();
+
+                this.macAddress                 = in.readString();
+                this.sessionStartDate           = in.readString();
+                this.sessionStopDate            = in.readString();
+                this.sessionStartLocation       = Location.CREATOR.createFromParcel(in);
+                this.sessionStopLocation        = Location.CREATOR.createFromParcel(in);
+                this.sessionDuration            = in.readInt();
         }
 
         public void readFromParcel(Parcel in) {
-                this.macAddress = in.readString();
-                this.sessionStartDate = in.readString();
-                this.sessionStopDate = in.readString();
-                this.sessionStartLocation=Location.CREATOR.createFromParcel(in);
-                this.sessionStopLocation=Location.CREATOR.createFromParcel(in);
-                this.sessionDuration = in.readInt();
+                this.macAddress                 = in.readString();
+                this.sessionStartDate           = in.readString();
+                this.sessionStopDate            = in.readString();
+                this.sessionStartLocation       = Location.CREATOR.createFromParcel(in);
+                this.sessionStopLocation        = Location.CREATOR.createFromParcel(in);
+                this.sessionDuration            = in.readInt();
         }
 
         public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+
                 public DeviceDBModel createFromParcel(Parcel in) {
                         return  new DeviceDBModel(in);
                 }

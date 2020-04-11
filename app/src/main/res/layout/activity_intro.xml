@@ -4,12 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     tools:context="com.roinspace.covtrack.IntroActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -17,27 +20,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Button
+        <ImageButton
             android:id="@+id/en_language_btn"
 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-
-
-            android:text="English" />
-
-        <Button
-            android:id="@+id/ro_language_btn"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-
-            android:text="Romanian" />
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:src="@drawable/english_btn_selector"
+            android:text="" />
 
         <Space
             android:layout_width="0dp"
             android:layout_height="20dp"
             android:layout_weight="1"></Space>
+
+        <ImageButton
+            android:id="@+id/ro_language_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:src="@drawable/romanian_btn_selector"
+            android:text="" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

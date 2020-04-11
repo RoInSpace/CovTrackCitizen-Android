@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -39,25 +40,40 @@ import java.util.ArrayList;
 
 public class InfectedPatientsActivity extends AppCompatActivity {
 
-    private TextView infectedDevicesTextView;
-    private ListView patientsList;
-    private Button backBtn;
+
+    private ImageButton backBtn;
     private Context     context;
+    private TextView    infectedDevicesTextView;
+    private ListView    patientsList;
 
     private ArrayList<DeviceDBModel> receivedPatientsList;
+
+    public  final static String RECEIVE_PATIENT_LIST = "RECEIVE_PATIENT_LIST";
 
     @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_infected_patients);
         context = this;
 
         Bundle extras = getIntent().getExtras();
 
         infectedDevicesTextView = findViewById(R.id.textView_infected_devices);
-        patientsList            = (ListView) findViewById(R.id.listView);
-        backBtn                 = (Button)findViewById(R.id.verifyBtn);
+        patientsList            = findViewById(R.id.listView);
+        backBtn                 = findViewById(R.id.verifyBtn);
+
+        if(Globals.LANGUAGE.compareTo("ro") == 0)
+        {
+            backBtn.setImageResource(R.drawable.main_menu_btn_selector_ro);
+
+        }
+        else
+        {
+            backBtn.setImageResource(R.drawable.main_menu_btn_selector_en);
+
+        }
 
         ObjectAnimator colorAnim = ObjectAnimator.ofInt(infectedDevicesTextView, "textColor",
                 Color.RED, Color.GREEN);
@@ -68,10 +84,10 @@ public class InfectedPatientsActivity extends AppCompatActivity {
         colorAnim.start();
 
         infectedDevicesTextView.setText(Globals.getStringInLocale("text_infected_devices_brief",this));
-        backBtn.setText(Globals.getStringInLocale("button_back", this));
+
 
         if (extras != null) {
-            receivedPatientsList = extras.getParcelableArrayList("patient_array");
+            receivedPatientsList = extras.getParcelableArrayList(RECEIVE_PATIENT_LIST);
             patientsList.setAdapter(new DeviceDBModelAdapter(context, receivedPatientsList));
         }
 

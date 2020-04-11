@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 public class IntroActivity extends AppCompatActivity {
 
@@ -36,8 +37,18 @@ public class IntroActivity extends AppCompatActivity {
 
         context = this;
 
-        Button enLanguageBtn = findViewById(R.id.en_language_btn);
-        Button roLanguageBtn = findViewById(R.id.ro_language_btn);
+        dbUtil databaseConn = new dbUtil(getApplicationContext());
+        String language = databaseConn.getAppLanguage();
+        if(language != null) {
+            Globals.LANGUAGE = language;
+            Intent intent = new Intent(context, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        databaseConn.close();
+
+        ImageButton enLanguageBtn = findViewById(R.id.en_language_btn);
+        ImageButton roLanguageBtn = findViewById(R.id.ro_language_btn);
 
         enLanguageBtn.setOnClickListener(new View.OnClickListener()
         {
@@ -45,6 +56,9 @@ public class IntroActivity extends AppCompatActivity {
             public void onClick(View v)
             {
                 Globals.LANGUAGE = "en";
+                dbUtil databaseConn = new dbUtil(getApplicationContext());
+                databaseConn.setAppLanguage(Globals.LANGUAGE);
+                databaseConn.close();
                 Intent intent = new Intent(context, MainActivity.class);
                 startActivity(intent);
                 finish();
@@ -57,10 +71,15 @@ public class IntroActivity extends AppCompatActivity {
             public void onClick(View v)
             {
                 Globals.LANGUAGE = "ro";
+                dbUtil databaseConn = new dbUtil(getApplicationContext());
+                databaseConn.setAppLanguage(Globals.LANGUAGE);
+                databaseConn.close();
                 Intent intent = new Intent(context, MainActivity.class);
                 startActivity(intent);
                 finish();
             }
         });;
+
+
     }
 }

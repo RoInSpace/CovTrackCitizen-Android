@@ -64,8 +64,8 @@ import java.util.TimerTask;
 
 public class BluetoothService extends Service {
 
-    private static String   TAG           = "BLUETOOTH_BACKGROUND_SERVICE";
-    private static String   CHANNEL_ID    = "COVID_APP";
+    private static String       TAG           = "BLUETOOTH_BACKGROUND_SERVICE";
+    private static String       CHANNEL_ID    = "COVID_APP";
 
     private static boolean      ENABLE_SCREEN_ON_OFF = false;
     private final static int    BLUETOOTH_SCANNING_INTERVAL = 20*1000;
@@ -81,10 +81,9 @@ public class BluetoothService extends Service {
     private Timer                   timer;
     private Date                    lastDiscoveryStart;
     private Context                 serviceContext;
+    public Location                 lastKnownLocation;
+
     private FusedLocationProviderClient mFusedLocationClient;
-
-    public Location lastKnownLocation;
-
 
     public BluetoothService() {
     }
@@ -99,54 +98,21 @@ public class BluetoothService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         super.onStartCommand(intent, flags, startId);
-        serviceContext = this;
 
-        filter.addAction(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        if (intent.getAction().equals(MainActivity.START_FOREGROUND_ACTION)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-        registerReceiver(mReceiver, filter);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        final BluetoothManager bluetoothManager = (BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
-
-        if (bluetoothManager != null)
-            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        if (!mBluetoothAdapter.isEnabled()) {
-            mBluetoothAdapter.enable();
+                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Channel human readable title", NotificationManager.IMPORTANCE_DEFAULT);
+                channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+                ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+                Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID).setContentTitle("").setContentText("").build();
+                startForeground(1, notification);
+            }
         }
-
-        mBluetoothAdapter.startDiscovery();
-
-        try {
-            Method bluetoothDeviceVisibility;
-            bluetoothDeviceVisibility = mBluetoothAdapter.getClass().getMethod("setScanMode", int.class, int.class);
-            bluetoothDeviceVisibility.invoke(mBluetoothAdapter, BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
+        else if (intent.getAction().equals( MainActivity.STOP_FOREGROUND_ACTION)) {
+            stopForeground(true);
+            stopSelf();
         }
-
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-              @Override
-              public void run() {
-                  checkLocationAvailability();
-
-                  if (!mBluetoothAdapter.isEnabled()) {
-                      mBluetoothAdapter.enable();
-                  }
-
-                  lastDiscoveryStart = new Date();
-
-                  if(ENABLE_SCREEN_ON_OFF) {
-                      PowerManager pm = (PowerManager) serviceContext.getSystemService(Context.POWER_SERVICE);
-                      PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, TAG);
-                      wl.acquire();
-                      wl.release();
-                  }
-
-                  mBluetoothAdapter.startDiscovery();
-              }
-          }, 0, BLUETOOTH_SCANNING_INTERVAL);
 
         return START_STICKY;
     }
@@ -155,20 +121,60 @@ public class BluetoothService extends Service {
     public void onCreate() {
         Log.d(TAG, "Create Bluetooth Service");
 
-        if (Build.VERSION.SDK_INT >= 26) {
+        serviceContext = this;
 
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Channel human readable title", NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
-            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID).setContentTitle("").setContentText("").build();
-            startForeground(1, notification);
-        }
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+
+        registerReceiver(mReceiver, filter);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        setBluetoothEnable();
+
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+
+                checkLocationAvailability();
+
+                lastDiscoveryStart = new Date();
+
+                if(ENABLE_SCREEN_ON_OFF) {
+                    PowerManager pm = (PowerManager) serviceContext.getSystemService(Context.POWER_SERVICE);
+                    PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, TAG);
+                    wl.acquire();
+                    wl.release();
+                }
+
+                setBluetoothEnable();
+
+                if(!isBluetoothDiscoverable())
+                    setBluetoothDiscoverable();
+
+                mBluetoothAdapter.startDiscovery();
+
+            }
+        }, 0, BLUETOOTH_SCANNING_INTERVAL);
     }
 
     @Override
     public void onDestroy() {
+
         Log.d(TAG, "Destroy Bluetooth Service");
 
+        if (mBluetoothAdapter.isEnabled()) {
+            mBluetoothAdapter.disable();
+        }
+
+        if(timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+
+        unregisterReceiver(mReceiver);
     }
 
     private boolean checkPermissions() {
@@ -210,6 +216,7 @@ public class BluetoothService extends Service {
     private void requestNewLocationData(){
 
         LocationRequest mLocationRequest = new LocationRequest();
+
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(0);
         mLocationRequest.setFastestInterval(0);
@@ -230,15 +237,41 @@ public class BluetoothService extends Service {
     boolean checkLocationAvailability() {
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Log.d("LOCATION","not enbled");
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             return false;
-        }
         else
-        {
-            Log.d("LOCATION"," enbled");
             return true;
+    }
+
+    private void setBluetoothEnable() {
+        final BluetoothManager bluetoothManager = (BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
+
+        if (bluetoothManager != null)
+            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (!mBluetoothAdapter.isEnabled()) {
+
+            mBluetoothAdapter.enable();
         }
+    }
+
+    private void setBluetoothDiscoverable() {
+
+        try {
+            Method bluetoothDeviceVisibility;
+            bluetoothDeviceVisibility = mBluetoothAdapter.getClass().getMethod("setScanMode", int.class, int.class);
+            bluetoothDeviceVisibility.invoke(mBluetoothAdapter, BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private boolean isBluetoothDiscoverable() {
+        if(mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE)
+            return false;
+        else
+            return true;
     }
 
     public  BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -255,14 +288,35 @@ public class BluetoothService extends Service {
 
                 }
             }
+
+            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
+                        BluetoothAdapter.ERROR);
+                switch (state) {
+                    case BluetoothAdapter.STATE_OFF:
+                        Log.d(TAG,"Bluetooth off");
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_OFF:
+                        Log.d(TAG,"Turning Bluetooth off...");
+                        break;
+                    case BluetoothAdapter.STATE_ON:
+                    {
+                        if(!isBluetoothDiscoverable())
+                            setBluetoothDiscoverable();
+                        mBluetoothAdapter.startDiscovery();
+                    }
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_ON:
+                        Log.d(TAG,"Turning Bluetooth on...");
+                        break;
+                }
+            }
+
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-                int  rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MAX_VALUE);
-
-                Location deviceLocation = new Location("");
-
+                BluetoothDevice device          = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                Location        deviceLocation  = new Location("");
+                int             rssi            = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MAX_VALUE);
 
                 if(checkLocationAvailability())
                 {
@@ -293,18 +347,17 @@ public class BluetoothService extends Service {
                         databaseConn.close();
                     }
 
-                    if (entry.getValue().getStopCurrentSessionDate().getTime() < lastDiscoveryStart.getTime()-BLUETOOTH_SCANNING_INTERVAL) {
+                    if (entry.getValue().getStopCurrentSessionDate().getTime() < lastDiscoveryStart.getTime()-BLUETOOTH_SCANNING_INTERVAL)
                         entry.getValue().setStatus(BTDevice.IS_OFF);
-                    }
-                    else {
+                    else
                         entry.getValue().setStatus(BTDevice.IS_ACTIVE);
-                    }
+
                 }
 
                 Log.d("BT found", device.getName() + "\n" + device.getAddress()+ " " + rssi);
 
-                Intent RTReturn = new Intent(MainActivity.RECEIVE_MAC_LIST);
-                LocalBroadcastManager.getInstance(context).sendBroadcast(RTReturn);
+                Intent macAddressIntent = new Intent(MainActivity.RECEIVE_MAC_LIST);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(macAddressIntent);
 
             }
         }

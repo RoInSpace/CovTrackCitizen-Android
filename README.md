@@ -1,4 +1,4 @@
-﻿# Introduction 
+# Introduction 
 The app monitors people in your vicinity who are identifiable by the Bluetooth connection of your mobile phone and stores the identification data of these devices. By pressing a button you can access the database in which the unique identifiers of the mobile phones are registered, to verify whether the persons with whom you came in contact have subsequently been confirmed with COVID-19. If you have identified a potential contact, please confer with the authorities whether that contact requires your inclusion among the monitored persons, or even testing for COVID-19.
 
 Logical steps:
@@ -23,4 +23,4 @@ The source code of the application is available on GitHub - CovTrack project. It
 
 A compiled version of the application can be found on the RISE web page at http://covid19.roinspace.com/index.php?download=APP. To install it, enter this address using an Android terminal and agree to download it. You may need to enter the URL by copying it, if the download does not start automatically.
 
-When the download is complete, open the file and install it. You may need to enable the option of installing applications from unknown sources in your phone’s settings. The application is safe and was developed only for the purpose of monitoring the COVID-19 epidemic. The code is available for audit on GitHub.
+When the download is complete, open the file and install it. You may need to enable the option of installing applications from unknown sources in your phone’s settings. The application is safe and was developed only for the purpose of monitoring the COVID-19 epidemic. The code is available to audit on GitHub.

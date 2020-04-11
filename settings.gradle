@@ -1,2 +1,2 @@
-rootProject.name='Database File Test'
+rootProject.name='CovTrack'
 include ':app'
